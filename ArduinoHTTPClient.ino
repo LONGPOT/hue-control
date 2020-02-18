@@ -33,8 +33,8 @@ int sat =0;
 //In the setup() method, initialize serial communications at 9600 bits per second, and set the LED’s pin to be an output.
 
 int status = WL_IDLE_STATUS;      // the Wifi radio's status
-char hueHubIP[] = "172.22.151.181";  // IP address of the HUE bridge
-String hueUserName = "D2cKhR2unkKIseRZdtN0UEzNLwpCFv84yuTQc-Iz"; // hue bridge username
+char hueHubIP[] = "***";  // IP address of the HUE bridge
+String hueUserName = "***"; // hue bridge username
 
 // make a wifi instance and a HttpClient instance:
 WiFiClient wifi;
