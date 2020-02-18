@@ -25,7 +25,8 @@
 #include "arduino_secrets.h"
 
 const int ledPin = 9;       // pin that the LED is attached to
-int analogValue = 0;        // value read from the pot
+int analogValue = 0;  
+int analogValue2 = 0;// value read from the pot
 int brightness = 0; 
 int hue = 0;// PWM pin that the LED is on.
 int sat =0;
@@ -56,14 +57,14 @@ void setup() {
 
     // declare the led pin as an output:
     pinMode(ledPin, OUTPUT);
-    sendRequestbri(1, "on", "true");   // turn light on
-  delay(1500);                    // wait 4 seconds
-  sendRequestbri(1, "on", "false");  // turn light off
-  //delay(1000);    // wait 4 seconds
-  sendRequestbri(1, "on", "true");   // turn light on
-  delay(1000);                    // wait 4 seconds
-  //sendRequestbri(1, "on", "false");  // turn light off
-  //delay(2000);    // wait 4 seconds
+    sendRequest(1, "on", "true");   // turn light on
+    delay(1500);                    // wait 4 seconds
+    sendRequest(1, "on", "false");  // turn light off
+    //delay(1000);    // wait 4 seconds
+    sendRequest(1, "on", "true");   // turn light on
+    delay(1000);                    // wait 4 seconds
+    //sendRequestbri(1, "on", "false");  // turn light off
+    //delay(2000);    // wait 4 seconds
     
   }
 
@@ -75,27 +76,20 @@ void setup() {
 
 void loop() {
   analogValue = analogRead(A0);    // read the pot value
-  brightness = analogValue /4;       //divide by 4 to fit in a byte
-  analogWrite(ledPin, brightness);   // PWM the LED with the brightness value
-  Serial.println("brightness"+brightness);        // print the brightness value back to the serial monitor'
-  sendRequest(1, "bri", brightness);   // turn light on
-//  sendRequest(1, "on", "true");   // turn light on
-//  delay(4000);                    // wait 4 seconds
-//  sendRequest(1, "on", "false");  // turn light off
-//  delay(4000);    // wait 4 seconds
+  brightness = analogValue/4;       //divide by 4 to fit in a byte
+  //analogWrite(ledPin, brightness);   // PWM the LED with the brightness value
+  Serial.println(analogValue);
+  Serial.println(brightness);// print the brightness value back to the serial monitor'
+  sendRequestbri(1, "bri", brightness);   // turn light on
 
-  analogValue = analogRead(A1);    // read the pot value
-  hue = analogValue *60;       //divide by 4 to fit in a byte
+  analogValue2 = analogRead(A1);    // read the pot value
+  hue = analogValue2 *60;       //divide by 4 to fit in a byte
   //analogWrite(ledPin, hue);   // PWM the LED with the brightness value
   Serial.println("hue"+hue);        // print the brightness value back to the serial monitor'
-  sendRequest(1, "hue", hue);   // turn light on
-
-   
-
-  
+  sendRequestbri(1, "hue", hue);   // turn light on
 }
 
-void sendRequest(int light, String cmd, int value) {
+void sendRequest(int light, String cmd, String value) {
   // make a String for the HTTP request path:
   String request = "/api/" + hueUserName;
   request += "/lights/";
@@ -129,7 +123,7 @@ void sendRequest(int light, String cmd, int value) {
   Serial.println();
 }
 
-void sendRequestbri(int light, String cmd, String value) {
+void sendRequestbri(int light, String cmd, int value) {
   // make a String for the HTTP request path:
   String request = "/api/" + hueUserName;
   request += "/lights/";
