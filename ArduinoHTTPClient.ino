@@ -64,6 +64,7 @@ void loop() {
   sendRequest(1, "hue", hue);   // turn light on
 }
 
+//The bulb blink to confirmed the connection
 void sendRequestReset(int light, String cmd, String value) {
   // make a String for the HTTP request path:
   String request = "/api/" + hueUserName;
@@ -103,7 +104,7 @@ void sendRequestReset(int light, String cmd, String value) {
   Serial.println();
 }
 
-void sendRequestbri(int light, String cmd, int value) {
+void sendRequest(int light, String cmd, int value) {
   // make a String for the HTTP request path:
   String request = "/api/" + hueUserName;
   request += "/lights/";
