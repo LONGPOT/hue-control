@@ -7,7 +7,7 @@ const int ledPin = 9;       // pin that the LED is attached to
 int analogValue = 0;  
 int analogValue2 = 0;// value read from the pot
 int brightness = 0; 
-int hue = 0;// PWM pin that the LED is on.
+int hue = 60000;// PWM pin that the LED is on.
 int sat =0;
 long lastRequest= 10000;
 int requestDelay= 500;
@@ -38,11 +38,13 @@ void setup() {
     // declare the led pin as an output:
     pinMode(ledPin, OUTPUT);
     sendRequestReset(1, "on", "true");   // turn light on
-    delay(1500);                    // wait 4 seconds
+    delay(1500);                    // wait seconds
     sendRequestReset(1, "on", "false");  // turn light off
     sendRequestReset(1, "on", "true");   // turn light on
     sendRequestReset(1, "on", "false");  // turn light off
     sendRequestReset(1, "on", "true");   // turn light on
+
+    sendRequest(1, "hue", hue);   // turn light on
   }
 
   // you're connected now, so print out the data:
@@ -92,21 +94,21 @@ void sendRequestReset(int light, String cmd, String value) {
   // make the PUT request to the hub:
   httpClient.put(request, contentType, hueCmd);
   
-  // read the status code and body of the response
-//   int statusCode = httpClient.responseStatusCode();
-//   String response = httpClient.responseBody();
-   while(httpClient.connected()){
-    if(httpClient.available()){
-      Serial.println(httpClient.read());
-      }
-  }
+   //read the status code and body of the response
+   int statusCode = httpClient.responseStatusCode();
+   String response = httpClient.responseBody();
+//   while(httpClient.connected()){
+//    if(httpClient.available()){
+//      Serial.println(httpClient.read());
+//      }
+//  }
 
   Serial.println(hueCmd);
   Serial.print("Status code from server: ");
-//  Serial.println(statusCode);
-//  Serial.print("Server response: ");
-//  Serial.println(response);
-//  Serial.println();
+  Serial.println(statusCode);
+  Serial.print("Server response: ");
+  Serial.println(response);
+  Serial.println();
 }
 
 void sendRequest(int light, String cmd, int  value) {
