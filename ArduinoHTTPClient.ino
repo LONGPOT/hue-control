@@ -37,7 +37,7 @@ void setup() {
 
     // declare the led pin as an output:
     pinMode(ledPin, OUTPUT);
-    sendRequest(1, "on", "true");   // turn light on
+    sendRequestReset(1, "on", "true");   // turn light on
     delay(1500);                    // wait 4 seconds
     sendRequestReset(1, "on", "false");  // turn light off
     sendRequestReset(1, "on", "true");   // turn light on
@@ -103,13 +103,13 @@ void sendRequestReset(int light, String cmd, String value) {
 
   Serial.println(hueCmd);
   Serial.print("Status code from server: ");
-  Serial.println(statusCode);
-  Serial.print("Server response: ");
-  Serial.println(response);
-  Serial.println();
+//  Serial.println(statusCode);
+//  Serial.print("Server response: ");
+//  Serial.println(response);
+//  Serial.println();
 }
 
-void sendRequest(int light, String cmd, int value) {
+void sendRequest(int light, String cmd, int  value) {
   // make a String for the HTTP request path:
   String request = "/api/" + hueUserName;
   request += "/lights/";
@@ -131,7 +131,6 @@ void sendRequest(int light, String cmd, int value) {
   // make the PUT request to the hub:
   httpClient.put(request, contentType, hueCmd);
 
-  if()
   while(httpClient.connected()){
     if(httpClient.available()){
       Serial.println(httpClient.read());
