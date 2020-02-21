@@ -1,24 +1,3 @@
-/* HueBlink example for ArduinoHttpClient library
-   Uses ArduinoHttpClient library to control Philips Hue
-   For more on Hue developer API see http://developer.meethue.com
-   For more on the ArduinoHttpClient, install the library from the
-   Library Manager.
-  To control a light, the Hue expects a HTTP PUT request to:
-  http://hue.hub.address/api/hueUserName/lights/lightNumber/state
-  The body of the PUT request looks like this:
-  {"on": true} or {"on":false}
-  This example  shows how to concatenate Strings to assemble the
-  PUT request and the body of the request.
-  note: WiFi SSID and password are stored in arduino_secrets.h file.
-  If it is not present, add a new tab, call it "arduino_secrets.h" 
-  and add the following defines, and change to your own values:
-  #define SECRET_SSID "ssid"    
-  #define SECRET_PASS "password"
-  
-   modified 6 Jan 2018 
-   by Tom Igoe (tigoe)
-*/
-
 #include <SPI.h>
 #include <WiFiNINA.h>
 #include <ArduinoHttpClient.h>
@@ -30,11 +9,10 @@ int analogValue2 = 0;// value read from the pot
 int brightness = 0; 
 int hue = 0;// PWM pin that the LED is on.
 int sat =0;
-//In the setup() method, initialize serial communications at 9600 bits per second, and set the LED’s pin to be an output.
 
 int status = WL_IDLE_STATUS;      // the Wifi radio's status
-char hueHubIP[] = "***";  // IP address of the HUE bridge
-String hueUserName = "***"; // hue bridge username
+char hueHubIP[] = "172.22.151.181";  // IP address of the HUE bridge
+String hueUserName = "D2cKhR2unkKIseRZdtN0UEzNLwpCFv84yuTQc-Iz"; // hue bridge username
 
 // make a wifi instance and a HttpClient instance:
 WiFiClient wifi;
@@ -59,13 +37,10 @@ void setup() {
     pinMode(ledPin, OUTPUT);
     sendRequest(1, "on", "true");   // turn light on
     delay(1500);                    // wait 4 seconds
-    sendRequest(1, "on", "false");  // turn light off
-    //delay(1000);    // wait 4 seconds
-    sendRequest(1, "on", "true");   // turn light on
-    delay(1000);                    // wait 4 seconds
-    //sendRequestbri(1, "on", "false");  // turn light off
-    //delay(2000);    // wait 4 seconds
-    
+    sendRequestReset(1, "on", "false");  // turn light off
+    sendRequestReset(1, "on", "true");   // turn light on
+    sendRequestReset(1, "on", "false");  // turn light off
+    sendRequestReset(1, "on", "true");   // turn light on
   }
 
   // you're connected now, so print out the data:
@@ -76,20 +51,20 @@ void setup() {
 
 void loop() {
   analogValue = analogRead(A0);    // read the pot value
-  brightness = analogValue/4;       //divide by 4 to fit in a byte
+  brightness = map(analogValue,0, 100, 0, 254);       //divide by 4 to fit in a byte
   //analogWrite(ledPin, brightness);   // PWM the LED with the brightness value
   Serial.println(analogValue);
   Serial.println(brightness);// print the brightness value back to the serial monitor'
-  sendRequestbri(1, "bri", brightness);   // turn light on
+  sendRequest(1, "bri", brightness);   // PWM the hue bulb with the brightness value
 
   analogValue2 = analogRead(A1);    // read the pot value
-  hue = analogValue2 *60;       //divide by 4 to fit in a byte
+  hue = map(analogValue2,0, 100, 0, 65535);       //divide by 4 to fit in a byte
   //analogWrite(ledPin, hue);   // PWM the LED with the brightness value
   Serial.println("hue"+hue);        // print the brightness value back to the serial monitor'
-  sendRequestbri(1, "hue", hue);   // turn light on
+  sendRequest(1, "hue", hue);   // turn light on
 }
 
-void sendRequest(int light, String cmd, String value) {
+void sendRequestReset(int light, String cmd, String value) {
   // make a String for the HTTP request path:
   String request = "/api/" + hueUserName;
   request += "/lights/";
@@ -112,8 +87,13 @@ void sendRequest(int light, String cmd, String value) {
   httpClient.put(request, contentType, hueCmd);
   
   // read the status code and body of the response
-  int statusCode = httpClient.responseStatusCode();
-  String response = httpClient.responseBody();
+//   int statusCode = httpClient.responseStatusCode();
+//   String response = httpClient.responseBody();
+   while(httpClient.connected()){
+    if(httpClient.available()){
+      Serial.println(httpClient.read());
+      }
+  }
 
   Serial.println(hueCmd);
   Serial.print("Status code from server: ");
@@ -144,15 +124,20 @@ void sendRequestbri(int light, String cmd, int value) {
 
   // make the PUT request to the hub:
   httpClient.put(request, contentType, hueCmd);
-  
+
+  while(httpClient.connected()){
+    if(httpClient.available()){
+      Serial.println(httpClient.read());
+      }
+  }
   // read the status code and body of the response
-  int statusCode = httpClient.responseStatusCode();
-  String response = httpClient.responseBody();
+  //  int statusCode = httpClient.responseStatusCode();
+  //  String response = httpClient.responseBody();
 
   Serial.println(hueCmd);
-  Serial.print("Status code from server: ");
-  Serial.println(statusCode);
-  Serial.print("Server response: ");
-  Serial.println(response);
+//  Serial.print("Status code from server: ");
+//  Serial.println(statusCode);
+//  Serial.print("Server response: ");
+//  Serial.println(response);
   Serial.println();
 }
