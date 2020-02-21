@@ -9,6 +9,8 @@ int analogValue2 = 0;// value read from the pot
 int brightness = 0; 
 int hue = 0;// PWM pin that the LED is on.
 int sat =0;
+long lastRequest= 10000;
+int requestDelay= 500;
 
 int status = WL_IDLE_STATUS;      // the Wifi radio's status
 char hueHubIP[] = "172.22.151.181";  // IP address of the HUE bridge
@@ -55,13 +57,16 @@ void loop() {
   //analogWrite(ledPin, brightness);   // PWM the LED with the brightness value
   Serial.println(analogValue);
   Serial.println(brightness);// print the brightness value back to the serial monitor'
+  if (millis() - lastRequest > requestDelay) {
   sendRequest(1, "bri", brightness);   // PWM the hue bulb with the brightness value
-
+  }
   analogValue2 = analogRead(A1);    // read the pot value
   hue = map(analogValue2,0, 100, 0, 65535);       //divide by 4 to fit in a byte
   //analogWrite(ledPin, hue);   // PWM the LED with the brightness value
   Serial.println("hue"+hue);        // print the brightness value back to the serial monitor'
+  if (millis() - lastRequest > requestDelay) {
   sendRequest(1, "hue", hue);   // turn light on
+  }
 }
 
 //The bulb blink to confirmed the connection
@@ -126,6 +131,7 @@ void sendRequest(int light, String cmd, int value) {
   // make the PUT request to the hub:
   httpClient.put(request, contentType, hueCmd);
 
+  if()
   while(httpClient.connected()){
     if(httpClient.available()){
       Serial.println(httpClient.read());
